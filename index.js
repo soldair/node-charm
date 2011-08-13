@@ -74,13 +74,13 @@ Charm.prototype.position = function (x, y) {
                     .split(';')
                     .map(Number)
                 ;
-                cb(pos[0], pos[1]);
+                cb(pos[1], pos[0]);
                 return true;
             }
         });
     }
     else {
-        this.output.write(encode('[' + x + ';' + y + 'f'));
+        this.output.write(encode('[' + y + ';' + x + 'f'));
     }
     return this;
 };
