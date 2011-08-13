@@ -89,21 +89,41 @@ Charm.prototype.move = function (x, y) {
     // set relative coordinates
     var bufs = [];
     
-    if (y < 0) {
-        this.output.write(encode('[' + Math.floor(-y) + 'A'));
-    }
-    else if (y > 0) {
-        this.output.write(encode('[' + Math.floor(y) + 'B'));
-    }
+    if (y < 0) this.up(-y)
+    else if (y > 0) this.down(y)
     
-    if (x > 0) {
-        this.output.write(encode('[' + Math.floor(x) + 'C'));
-    }
-    else if (x < 0) {
-        this.output.write(encode('[' + Math.floor(-x) + 'D'));
-    }
+    if (x > 0) this.right(x)
+    else if (x < 0) this.left(-x)
     
     return this;
+};
+
+Charm.prototype.up = function (y) {
+    this.output.write(encode('[' + Math.floor(y) + 'A'));
+    return this;
+};
+
+Charm.prototype.down = function (y) {
+    this.output.write(encode('[' + Math.floor(y) + 'B'));
+    return this;
+};
+
+Charm.prototype.right = function (x) {
+    this.output.write(encode('[' + Math.floor(x) + 'C'));
+    return this;
+};
+
+Charm.prototype.left = function (x) {
+    this.output.write(encode('[' + Math.floor(x) + 'D'));
+    return this;
+};
+
+Charm.prototype.push = function (withAttributes) {
+    this.output.write(encode(withAttributes ? '7' : '[s'));
+};
+
+Charm.prototype.pop = function (withAttributes) {
+    this.output.write(encode(withAttributes ? '8' : '[u'));
 };
 
 Charm.prototype.destroy = function () {
