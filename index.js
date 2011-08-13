@@ -171,24 +171,21 @@ Charm.prototype.erase = function (s) {
     return this;
 };
 
-Charm.prototype.display = function (attrs) {
-    var self = this;
-    var s = attrs.split(/\s+/).map(function (attr) {
-        var c = {
-            reset : 0,
-            bright : 1,
-            dim : 2,
-            underscore : 4,
-            blink : 5,
-            reverse : 7,
-            hidden : 8
-        }[attr];
-        if (c === undefined) {
-            self.emit('error', new Error('Unknown attribute: ' + attr));
-        }
-    }).join(';');
-    self.write(encode('[' + s + 'm'));
-    return self;
+Charm.prototype.display = function (attr) {
+    var c = {
+        reset : 0,
+        bright : 1,
+        dim : 2,
+        underscore : 4,
+        blink : 5,
+        reverse : 7,
+        hidden : 8
+    }[attr];
+    if (c === undefined) {
+        this.emit('error', new Error('Unknown attribute: ' + attr));
+    }
+    this.write(encode('[' + s + 'm'));
+    return this;
 };
 
 Charm.prototype.foreground = function (color) {
