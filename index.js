@@ -33,6 +33,10 @@ function Charm (input, output) {
     self.output = output;
     self.pending = [];
     
+    if (!output) {
+        self.emit('error', new Error('output stream required'));
+    }
+    
     if (input === process.stdin) {
         tty.setRawMode(true);
         input.resume();
@@ -58,12 +62,8 @@ function Charm (input, output) {
 Charm.prototype = new EventEmitter;
 
 Charm.prototype.position = function (x, y) {
-    if (!this.output) {
-        this.emit('error', new Error(
-            'output stream required to query position'
-        ));
-    }
-    else if (typeof x === 'function') {
+    // get/set absolute coordinates
+    if (typeof x === 'function') {
         var cb = x;
         this.output.write(encode('[6n'));
         this.pending.push(function (buf) {
@@ -82,6 +82,27 @@ Charm.prototype.position = function (x, y) {
     else {
         this.output.write(encode('[' + y + ';' + x + 'f'));
     }
+    return this;
+};
+
+Charm.prototype.move = function (x, y) {
+    // set relative coordinates
+    var bufs = [];
+    
+    if (y < 0) {
+        this.output.write(encode('[' + Math.floor(-y) + 'A'));
+    }
+    else if (y > 0) {
+        this.output.write(encode('[' + Math.floor(y) + 'B'));
+    }
+    
+    if (x > 0) {
+        this.output.write(encode('[' + Math.floor(x) + 'C'));
+    }
+    else if (x < 0) {
+        this.output.write(encode('[' + Math.floor(-x) + 'D'));
+    }
+    
     return this;
 };
 
