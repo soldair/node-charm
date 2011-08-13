@@ -61,6 +61,10 @@ function Charm (input, output) {
 
 Charm.prototype = new EventEmitter;
 
+Charm.prototype.destroy = function () {
+    if (this.input) this.input.destroy()
+};
+
 Charm.prototype.position = function (x, y) {
     // get/set absolute coordinates
     if (typeof x === 'function') {
@@ -126,6 +130,27 @@ Charm.prototype.pop = function (withAttributes) {
     this.output.write(encode(withAttributes ? '8' : '[u'));
 };
 
-Charm.prototype.destroy = function () {
-    if (this.input) this.input.destroy()
+Charm.prototype.erase = function (s) {
+    if (s === 'end' || s === '$') {
+        this.output.write(encode('[K'));
+    }
+    else if (s === 'start' || s === '^') {
+        this.output.write(encode('[1K'));
+    }
+    else if (s === 'line') {
+        this.output.write(encode('[2K'));
+    }
+    else if (s === 'down') {
+        this.output.write(encode('[J'));
+    }
+    else if (s === 'up') {
+        this.output.write(encode('[1J'));
+    }
+    else if (s === 'screen') {
+        this.output.write(encode('[1J'));
+    }
+    else {
+        this.emit('error', new Error('Unknown erase type: ' + s));
+    }
+    return this;
 };
