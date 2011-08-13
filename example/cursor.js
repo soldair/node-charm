@@ -1,4 +1,4 @@
-var charm = require('./')(process);
+var charm = require('charm')(process);
 
 charm.position(5, 10);
 

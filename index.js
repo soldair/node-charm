@@ -19,9 +19,11 @@ var exports = module.exports = function () {
         var arg = arguments[i];
         if (!arg) continue;
         if (arg.readable) setInput(arg)
+        else if (arg.stdin || arg.input) setInput(arg.stdin || arg.input)
+        
         if (arg.writable) setOutput(arg)
-        if (arg.stdin || arg.input) setInput(arg.stdin || arg.input)
-        if (arg.stdout || arg.output) setOutput(arg.stdout || arg.output)
+        else if (arg.stdout || arg.output) setOutput(arg.stdout || arg.output)
+        
     }
     
     return new Charm(input, output);
