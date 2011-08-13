@@ -65,11 +65,20 @@ Charm.prototype.destroy = function () {
     if (this.input) this.input.destroy()
 };
 
+Charm.prototype.write = function (msg) {
+    this.output.write(msg);
+    return this;
+};
+
+Charm.prototype.reset = function (cb) {
+    this.write(encode('c'));
+    return this;
+};
+
 Charm.prototype.position = function (x, y) {
     // get/set absolute coordinates
     if (typeof x === 'function') {
         var cb = x;
-        this.output.write(encode('[6n'));
         this.pending.push(function (buf) {
             if (buf[0] === 27 && buf[1] === encode.ord('[')
             && buf[buf.length-1] === encode.ord('R')) {
@@ -82,9 +91,12 @@ Charm.prototype.position = function (x, y) {
                 return true;
             }
         });
+        this.write(encode('[6n'));
     }
     else {
-        this.output.write(encode('[' + y + ';' + x + 'f'));
+        this.write(encode(
+            '[' + Math.floor(y) + ';' + Math.floor(x) + 'f'
+        ));
     }
     return this;
 };
@@ -103,54 +115,110 @@ Charm.prototype.move = function (x, y) {
 };
 
 Charm.prototype.up = function (y) {
-    this.output.write(encode('[' + Math.floor(y) + 'A'));
+    this.write(encode('[' + Math.floor(y) + 'A'));
     return this;
 };
 
 Charm.prototype.down = function (y) {
-    this.output.write(encode('[' + Math.floor(y) + 'B'));
+    this.write(encode('[' + Math.floor(y) + 'B'));
     return this;
 };
 
 Charm.prototype.right = function (x) {
-    this.output.write(encode('[' + Math.floor(x) + 'C'));
+    this.write(encode('[' + Math.floor(x) + 'C'));
     return this;
 };
 
 Charm.prototype.left = function (x) {
-    this.output.write(encode('[' + Math.floor(x) + 'D'));
+    this.write(encode('[' + Math.floor(x) + 'D'));
     return this;
 };
 
 Charm.prototype.push = function (withAttributes) {
-    this.output.write(encode(withAttributes ? '7' : '[s'));
+    this.write(encode(withAttributes ? '7' : '[s'));
+    return this;
 };
 
 Charm.prototype.pop = function (withAttributes) {
-    this.output.write(encode(withAttributes ? '8' : '[u'));
+    this.write(encode(withAttributes ? '8' : '[u'));
+    return this;
 };
 
 Charm.prototype.erase = function (s) {
     if (s === 'end' || s === '$') {
-        this.output.write(encode('[K'));
+        this.write(encode('[K'));
     }
     else if (s === 'start' || s === '^') {
-        this.output.write(encode('[1K'));
+        this.write(encode('[1K'));
     }
     else if (s === 'line') {
-        this.output.write(encode('[2K'));
+        this.write(encode('[2K'));
     }
     else if (s === 'down') {
-        this.output.write(encode('[J'));
+        this.write(encode('[J'));
     }
     else if (s === 'up') {
-        this.output.write(encode('[1J'));
+        this.write(encode('[1J'));
     }
     else if (s === 'screen') {
-        this.output.write(encode('[1J'));
+        this.write(encode('[1J'));
     }
     else {
         this.emit('error', new Error('Unknown erase type: ' + s));
     }
+    return this;
+};
+
+Charm.prototype.display = function (attrs) {
+    var self = this;
+    var s = attrs.split(/\s+/).map(function (attr) {
+        var c = {
+            reset : 0,
+            bright : 1,
+            dim : 2,
+            underscore : 4,
+            blink : 5,
+            reverse : 7,
+            hidden : 8
+        }[attr];
+        if (c === undefined) {
+            self.emit('error', new Error('Unknown attribute: ' + attr));
+        }
+    }).join(';');
+    self.write(encode('[' + s + 'm'));
+    return self;
+};
+
+Charm.prototype.foreground = function (color) {
+    var c = {
+        black : 30,
+        red : 31,
+        green : 32,
+        yellow : 33,
+        blue : 34,
+        magenta : 35,
+        cyan : 36,
+        white : 37
+    }[color.toLowerCase()];
+    if (!c) this.emit('error', new Error('Unknown color: ' + color));
+    
+    this.write(encode('[' + c + 'm'));
+    return this;
+};
+
+Charm.prototype.background = function (color) {
+    var c = {
+        black : 40,
+        red : 41,
+        green : 42,
+        yellow : 43,
+        blue : 44,
+        magenta : 45,
+        cyan : 46,
+        white : 47
+    }[color.toLowerCase()];
+    if (!c) this.emit('error', new Error('Unknown color: ' + color));
+    
+    this.write(encode('[' + c + 'm'));
     return this;
 };
