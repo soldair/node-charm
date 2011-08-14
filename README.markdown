@@ -44,6 +44,20 @@ charm.on('data', function (buf) {
 });
 ````
 
+events
+======
+
+Charm objects pass along the data events from their input stream except for
+events generated from querying the terminal device.
+
+Because charm puts stdin into raw mode, charm emits two special events: "^C" and
+"^D" when the user types those combos. It's super convenient with these events
+to do:
+
+````javascript
+charm.on('^C', process.exit)
+````
+
 methods
 =======
 
@@ -55,9 +69,6 @@ Create a new `charm` given a `param` with `stdout` and `stdin` streams, such as
 
 Protip: you can pass in an http response object as an output stream and it will
 just work™.
-
-`charm` is an EventEmitter and passes along 'data' events from its input stream
-not related to querying the terminal device.
 
 charm.reset()
 -------------
