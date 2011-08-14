@@ -184,7 +184,7 @@ Charm.prototype.display = function (attr) {
     if (c === undefined) {
         this.emit('error', new Error('Unknown attribute: ' + attr));
     }
-    this.write(encode('[' + s + 'm'));
+    this.write(encode('[' + c + 'm'));
     return this;
 };
 
