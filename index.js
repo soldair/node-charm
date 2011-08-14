@@ -46,17 +46,30 @@ function Charm (input, output) {
     
     if (input) {
         input.on('data', function (buf) {
-            if (self.pending.length && buf[0] === 27) {
-                for (var i = 0; i < self.pending.length; i++) {
-                    var cb = self.pending[0];
-                    if (cb(buf)) {
-                        self.pending.shift();
-                        return;
+            if (self.pending.length) {
+                var codes = extractCodes(buf);
+                var matched = false;
+                
+                for (var i = 0; i < codes.length; i++) {
+                    for (var j = 0; j < self.pending.length; j++) {
+                        var cb = self.pending[j];
+                        if (cb(codes[i])) {
+                            matched = true;
+                            self.pending.splice(j, 1);
+                            break;
+                        }
                     }
                 }
+                
+                if (matched) return;
             }
             
             self.emit('data', buf)
+            
+            if (buf.length === 1) {
+                if (buf[0] === 3) self.emit('^C');
+                if (buf[0] === 4) self.emit('^D');
+            }
         });
     }
 }
@@ -221,3 +234,20 @@ Charm.prototype.background = function (color) {
     this.write(encode('[' + c + 'm'));
     return this;
 };
+
+var extractCodes = exports.extractCodes = function (buf) {
+    var codes = [];
+    var start = -1;
+    
+    for (var i = 0; i < buf.length; i++) {
+        if (buf[i] === 27) {
+            if (start >= 0) codes.push(buf.slice(start, i));
+            start = i;
+        }
+        else if (start >= 0 && i === buf.length - 1) {
+            codes.push(buf.slice(start));
+        }
+    }
+    
+    return codes;
+}
