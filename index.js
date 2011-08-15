@@ -29,7 +29,7 @@ var exports = module.exports = function () {
     return new Charm(input, output);
 };
 
-function Charm (input, output) {
+var Charm = exports.Charm = function (input, output) {
     var self = this;
     self.input = input;
     self.output = output;
