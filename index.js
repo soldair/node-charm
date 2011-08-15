@@ -235,6 +235,11 @@ Charm.prototype.background = function (color) {
     return this;
 };
 
+Charm.prototype.cursor = function (visible) {
+    this.write(encode(visible ? '[?25h' : '[?25l'));
+    return this;
+};
+
 var extractCodes = exports.extractCodes = function (buf) {
     var codes = [];
     var start = -1;
