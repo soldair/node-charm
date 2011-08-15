@@ -5,6 +5,8 @@ Use
 [ansi terminal characters](http://www.termsys.demon.co.uk/vtansi.htm)
 to write colors and cursor positions.
 
+[me lucky charms](http://substack.net/images/charms.png)
+
 example
 =======
 
