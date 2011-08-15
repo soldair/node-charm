@@ -184,6 +184,11 @@ Set the background color with the string `color`, which can be:
 * black
 * white
 
+charm.cursor(visible)
+---------------------
+
+Set the cursor visibility with a boolean `visible`.
+
 install
 =======
 
