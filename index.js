@@ -130,22 +130,31 @@ Charm.prototype.move = function (x, y) {
 };
 
 Charm.prototype.up = function (y) {
+    if (y === undefined) y = 1;
     this.write(encode('[' + Math.floor(y) + 'A'));
     return this;
 };
 
 Charm.prototype.down = function (y) {
+    if (y === undefined) y = 1;
     this.write(encode('[' + Math.floor(y) + 'B'));
     return this;
 };
 
 Charm.prototype.right = function (x) {
+    if (x === undefined) x = 1;
     this.write(encode('[' + Math.floor(x) + 'C'));
     return this;
 };
 
 Charm.prototype.left = function (x) {
+    if (x === undefined) x = 1;
     this.write(encode('[' + Math.floor(x) + 'D'));
+    return this;
+};
+
+Charm.prototype.column = function (x) {
+    this.write(encode('[' + Math.floor(x) + 'G'));
     return this;
 };
 
